@@ -25,6 +25,7 @@ func TestSchedule(t *testing.T) {
 	}, 100*time.Millisecond)
 	time.Sleep(350 * time.Millisecond)
 	s.CancelTask(taskId)
+	time.Sleep(100 * time.Millisecond)
 	require.EqualValues(t, 3, atomic.LoadInt32(&num), "number value error")
 	require.EqualValues(t, false, s.IsShutdown(), "status value error")
 }
@@ -36,6 +37,7 @@ func TestShutdown(t *testing.T) {
 	}, 100*time.Millisecond)
 	time.Sleep(350 * time.Millisecond)
 	s.Shutdown()
+	time.Sleep(100 * time.Millisecond)
 	require.EqualValues(t, 3, atomic.LoadInt32(&num), "number value error")
 	require.EqualValues(t, true, s.IsShutdown(), "status value error")
 }
