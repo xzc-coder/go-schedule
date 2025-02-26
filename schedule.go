@@ -142,7 +142,7 @@ func (s *Schedule) start() {
 				_, ok := s.executeTaskIdMap[task.id]
 				if !ok {
 					//是被取消的任务，移除后continue
-					s.taskHeap.Pop()
+					heap.Pop(&s.taskHeap)
 					continue
 				} else {
 					//设置执行间隔
@@ -152,7 +152,7 @@ func (s *Schedule) start() {
 			select {
 			case <-timer.C:
 				//到达第一个任务执行时间
-				task := s.taskHeap.Pop().(*Task)
+				task := heap.Pop(&s.taskHeap).(*Task)
 				//提交到线程池执行，返回的error不需要处理，因为任务池是无限大
 				_ = s.pool.Submit(task.job)
 				//单次执行则删除，多次执行，则更新
@@ -260,7 +260,7 @@ func (t *taskHeap) Len() int {
 	return len(*t)
 }
 func (t *taskHeap) Less(i, j int) bool {
-	return (*t)[i].executeTime.After((*t)[j].executeTime)
+	return (*t)[i].executeTime.Before((*t)[j].executeTime)
 }
 
 func (t *taskHeap) Swap(i, j int) {
@@ -282,5 +282,5 @@ func (t *taskHeap) Pop() interface{} {
 
 // Peek 查看堆顶元素，非堆接口的实现
 func (t *taskHeap) Peek() *Task {
-	return (*t)[len(*t)-1]
+	return (*t)[0]
 }
